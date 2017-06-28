@@ -1,7 +1,7 @@
 {
   "name": "js-core-data-graphql",
   "description": "GraphQL endpoint generator for js-core-data",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "keywords": [
     "js-core-data",

@@ -1,0 +1,24 @@
+Company:
+  columns:
+    name:
+      type: string
+      required: true
+  relationships:
+    employees:
+      entity: Person
+      toMany: true
+      inverse: companies
+
+Person:
+  columns:
+    firstname: string
+    lastname: string
+    age: int
+    salary:
+      type: decimal
+    birthdate: date
+  relationships:
+    companies:
+      entity: Company
+      toMany: true
+      inverse: employees

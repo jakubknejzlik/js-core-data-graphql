@@ -1,0 +1,35 @@
+{
+  "name": "js-core-data-graphql",
+  "description": "GraphQL endpoint generator for js-core-data",
+  "version": "0.0.1",
+  "license": "MIT",
+  "keywords": [
+    "js-core-data",
+    "ORM",
+    "CoreData",
+    "graphql",
+    "graphiql"
+  ],
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "graphql": "^0.10.1",
+    "graphql-server-express": "^0.8.5",
+    "inflection": "^1.12.0"
+  },
+  "devDependencies": {
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "js-core-data": "^1.6.4",
+    "mocha": "^3.4.2",
+    "sqlite3": "^3.1.8",
+    "supertest": "^3.0.0"
+  },
+  "scripts": {
+    "test": "mocha test",
+    "example": "node example/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jakubknejzlik/js-core-data-graphql.git"
+  }
+}

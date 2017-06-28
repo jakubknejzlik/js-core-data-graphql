@@ -1,17 +1,23 @@
 # js-core-data-graphql
-Authorization middleware for js-core-data
+GraphQL endpoint generator for js-core-data
 
 # Example
 
 ```
-const CoreData = require("js-core-data");
-const express = require('express');
-const CoreDataAuth = require('js-core-data-auth');
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const database = new CoreData(databaseUrl);
+const CoreData = require("js-core-data");
+const CoreDataGraphql = require("js-core-data-graphql");
+
+const database = new CoreData("sqlite://:memory:");
+// setup your schema
+
 const app = express();
 
-app.use(CoreDataAuth.auth(database));
+app.use(bodyParser.json());
+app.post("/graphql", CoreDataGraphql.graphql(database));
+app.get("/graphql", CoreDataGraphql.graphiql());
 
-app.listen(3000)
+app.listen(3000);
 ```

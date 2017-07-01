@@ -1,4 +1,7 @@
 # js-core-data-graphql
+
+[![Build Status](https://travis-ci.org/jakubknejzlik/js-core-data-graphql.svg?branch=master)](https://travis-ci.org/jakubknejzlik/js-core-data-graphql)
+
 GraphQL endpoint generator for js-core-data
 
 # Example

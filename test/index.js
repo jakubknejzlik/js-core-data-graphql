@@ -44,7 +44,6 @@ describe("graphql", () => {
       .get(`/graphql?query={getCompany(id:1){id}}`)
       .expect(200)
       .then(res => {
-        console.log(JSON.stringify(res.body));
         assert.equal(res.body.data.getCompany.id, 1);
       });
   });

@@ -38,6 +38,16 @@ describe("graphql", () => {
         assert.equal(res.body.data.getCompanies.length, 3);
       });
   });
+
+  it("should get a company", () => {
+    return test
+      .get(`/graphql?query={getCompany(id:1){id}}`)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.getCompany.id, 1);
+      });
+  });
+
   it("should get people", () => {
     return test
       .get(`/graphql?query={getPeople{firstname}}`)
@@ -46,4 +56,13 @@ describe("graphql", () => {
         assert.equal(res.body.data.getPeople.length, 2);
       });
   });
+
+  it("should get person", () => {
+    return test
+      .get(`/graphql?query={getPerson(id:1){id}}`)
+      // .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.getPerson.id, 1);
+      });
+  })
 });

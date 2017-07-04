@@ -41,10 +41,11 @@ describe("graphql", () => {
 
   it("should get a company", () => {
     return test
-      .get(`/graphql?query={getCompanyById(id:1){id}}`)
+      .get(`/graphql?query={getCompany(id:1){id}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getCompanyById.id, 1);
+        console.log(JSON.stringify(res.body));
+        assert.equal(res.body.data.getCompany.id, 1);
       });
   });
 
@@ -59,10 +60,10 @@ describe("graphql", () => {
 
   it("should get person", () => {
     return test
-      .get(`/graphql?query={getPersonById(id:1){id}}`)
-      .expect(200)
+      .get(`/graphql?query={getPerson(id:1){id}}`)
+      // .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getPersonById.id, 1);
+        assert.equal(res.body.data.getPerson.id, 1);
       });
   })
 });

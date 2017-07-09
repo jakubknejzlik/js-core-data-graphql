@@ -60,9 +60,65 @@ describe("graphql", () => {
   it("should get person", () => {
     return test
       .get(`/graphql?query={getPerson(id:1){id}}`)
-      // .expect(200)
+      .expect(200)
       .then(res => {
+        console.log(JSON.stringify(res.body));
         assert.equal(res.body.data.getPerson.id, 1);
       });
   })
+
+  it("delete a company by id", () => {
+    let postData = {
+      query: `mutation deleteCompany($id: Int){
+                deleteCompany(id: $id){
+                    id
+                    name
+                    employees{
+                      id
+                    }
+                }
+            }`,
+      variables: {
+        id: 1
+      }
+    };
+
+    //need to start the server example to run this test
+    return supertest('localhost:3000')
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.deleteCompany.id, 1);
+      });
+  });
+
+  it("delete a person by id", () => {
+    let postData = {
+      query: `mutation deletePerson($id: Int){
+                deletePerson(id: $id){
+                  id,
+                  firstname,
+                  lastname,
+                  age,
+                  salary,
+                  birthdate,
+                  companies{
+                    id
+                  }
+                }
+            }`,
+      variables: {
+        id: 1
+      }
+    };
+
+    return supertest('localhost:3000')
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.deletePerson.id, 1);
+      });
+  });
 });

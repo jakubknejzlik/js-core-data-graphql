@@ -3,6 +3,7 @@ const fs = require("fs");
 const CoreData = require("js-core-data");
 const supertest = require("supertest");
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const lib = require("../index");
 
@@ -10,6 +11,7 @@ const database = new CoreData("sqlite://:memory:");
 database.createModelFromYaml(fs.readFileSync(__dirname + "/schema.yml"));
 
 const app = express();
+app.use(bodyParser.json());
 app.use("/graphql", lib.graphql(database));
 
 const test = supertest(app);
@@ -84,7 +86,7 @@ describe("graphql", () => {
     };
 
     //need to start the server example to run this test
-    return supertest('localhost:3000')
+    return test
       .post(`/graphql?`)
       .send(postData)
       .expect(200)
@@ -102,10 +104,7 @@ describe("graphql", () => {
                   lastname,
                   age,
                   salary,
-                  birthdate,
-                  companies{
-                    id
-                  }
+                  birthdate
                 }
             }`,
       variables: {
@@ -113,7 +112,7 @@ describe("graphql", () => {
       }
     };
 
-    return supertest('localhost:3000')
+    return test
       .post(`/graphql?`)
       .send(postData)
       .expect(200)

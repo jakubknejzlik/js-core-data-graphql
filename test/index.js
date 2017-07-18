@@ -85,7 +85,6 @@ describe("graphql", () => {
       }
     };
 
-    //need to start the server example to run this test
     return test
       .post(`/graphql?`)
       .send(postData)
@@ -120,4 +119,64 @@ describe("graphql", () => {
         assert.equal(res.body.data.deletePerson.id, 1);
       });
   });
+
+  it("create a company", () => {
+    let postData = {
+      query: `mutation createCompany($input:  CompanyInputType){
+                createCompany(input: $input){
+                  id,
+                  name
+                }
+            }`,
+      variables: {
+        input: {
+          name: 'Company A'
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.createCompany.name, "Company A");
+      });
+  })
+
+  it("create a person", () => {
+    let postData = {
+      query: `mutation createPerson($input:  PersonInputType){
+                createPerson(input: $input){
+                  id,
+                  firstname,
+                  lastname,
+                  age,
+                  salary,
+                  birthdate
+                }
+            }`,
+      variables: {
+        input: {
+          firstname: 'FN',
+          lastname: 'LN',
+          age: 20,
+          salary: 20,
+          birthdate: new Date('01/01/2017')
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.createPerson.firstname, "FN");
+        assert.equal(res.body.data.createPerson.lastname, "LN");
+        assert.equal(res.body.data.createPerson.age, 20);
+        assert.equal(res.body.data.createPerson.salary, 20);
+        assert.equal(res.body.data.createPerson.birthdate, new Date('01/01/2017'));
+      });
+  })
 });

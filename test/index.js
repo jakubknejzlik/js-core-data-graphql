@@ -121,9 +121,8 @@ describe("graphql", () => {
 
   it("create a company", () => {
     let postData = {
-      query: `mutation createCompany($input:  CompanyInputType){
+      query: `mutation createCompany($input:  CompanyCreateInputType){
                 createCompany(input: $input){
-                  id,
                   name
                 }
             }`,
@@ -139,15 +138,15 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
+        console.log(JSON.stringify(res.body));
         assert.equal(res.body.data.createCompany.name, "Company A");
       });
   })
 
   it("create a person", () => {
     let postData = {
-      query: `mutation createPerson($input:  PersonInputType){
+      query: `mutation createPerson($input:  PersonCreateInputType){
                 createPerson(input: $input){
-                  id,
                   firstname,
                   lastname,
                   age,
@@ -181,7 +180,7 @@ describe("graphql", () => {
 
   it("update a company", () => {
     let postData = {
-      query: `mutation updateCompany($input:  CompanyInputUpdateType){
+      query: `mutation updateCompany($input:  CompanyUpdateInputType){
                 updateCompany(input: $input){
                   id,
                   name
@@ -215,7 +214,7 @@ describe("graphql", () => {
 
   it("update a person", () => {
     let postData = {
-      query: `mutation updatePerson($input:  PersonInputUpdateType){
+      query: `mutation updatePerson($input:  PersonUpdateInputType){
                 updatePerson(input: $input){
                   id,
                   firstname,

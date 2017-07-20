@@ -18,15 +18,15 @@ const test = supertest(app);
 
 describe("graphql", () => {
   beforeEach(() => {
-    return database.syncSchema({ force: true }).then(() => {
+    return database.syncSchema({force: true}).then(() => {
       const context = database.createContext();
 
-      context.create("Company", { name: "test" });
-      context.create("Company", { name: "test2" });
-      context.create("Company", { name: "test3" });
+      context.create("Company", {name: "test"});
+      context.create("Company", {name: "test2"});
+      context.create("Company", {name: "test3"});
 
-      context.create("Person", { firstname: "john", lastname: "Doe" });
-      context.create("Person", { firstname: "Jane", lastname: "Siri" });
+      context.create("Person", {firstname: "john", lastname: "Doe"});
+      context.create("Person", {firstname: "Jane", lastname: "Siri"});
 
       return context.save();
     });
@@ -64,7 +64,6 @@ describe("graphql", () => {
       .get(`/graphql?query={getPerson(id:1){id}}`)
       .expect(200)
       .then(res => {
-        console.log(JSON.stringify(res.body));
         assert.equal(res.body.data.getPerson.id, 1);
       });
   })
@@ -203,6 +202,14 @@ describe("graphql", () => {
       .then(res => {
         assert.equal(res.body.data.updateCompany.id, 1);
         assert.equal(res.body.data.updateCompany.name, "Company A");
+      }).then(() => {
+        return test
+          .get(`/graphql?query={getCompany(id:1){id, name}}`)
+          .expect(200)
+          .then(res => {
+            assert.equal(res.body.data.getCompany.id, 1);
+            assert.equal(res.body.data.getCompany.name, "Company A");
+          });
       });
   })
 
@@ -241,6 +248,18 @@ describe("graphql", () => {
         assert.equal(res.body.data.updatePerson.age, 20);
         assert.equal(res.body.data.updatePerson.salary, 20);
         assert.equal(res.body.data.updatePerson.birthdate, new Date('01/02/2017'));
+      }).then(() => {
+        return test
+          .get(`/graphql?query={getPerson(id:1){id, firstname, lastname, age, salary, birthdate}}`)
+          .expect(200)
+          .then(res => {
+            assert.equal(res.body.data.getPerson.id, 1);
+            assert.equal(res.body.data.getPerson.firstname, "FN");
+            assert.equal(res.body.data.getPerson.lastname, "LN");
+            assert.equal(res.body.data.getPerson.age, 20);
+            assert.equal(res.body.data.getPerson.salary, 20);
+            assert.equal(res.body.data.getPerson.birthdate, new Date('01/02/2017'));
+          });
       });
   })
 });

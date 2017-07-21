@@ -138,7 +138,6 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        console.log(JSON.stringify(res.body));
         assert.equal(res.body.data.createCompany.name, "Company A");
       });
   })

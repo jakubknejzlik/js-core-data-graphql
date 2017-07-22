@@ -24,9 +24,20 @@ describe("graphql", () => {
       context.create("Company", {name: "test"});
       context.create("Company", {name: "test2"});
       context.create("Company", {name: "test3"});
+      context.create("Company", {name: "test4"});
+      context.create("Company", {name: "test5"});
+      context.create("Company", {name: "test6"});
+      context.create("Company", {name: "test7"});
+      context.create("Company", {name: "test8"});
 
       context.create("Person", {firstname: "john", lastname: "Doe"});
       context.create("Person", {firstname: "Jane", lastname: "Siri"});
+      context.create("Person", {firstname: "FN 3", lastname: "LN 3"});
+      context.create("Person", {firstname: "FN 4", lastname: "LN 4"});
+      context.create("Person", {firstname: "FN 5", lastname: "LN 5"});
+      context.create("Person", {firstname: "FN 6", lastname: "LN 6"});
+      context.create("Person", {firstname: "FN 7", lastname: "LN 7"});
+      context.create("Person", {firstname: "FN 8", lastname: "LN 8"});
 
       return context.save();
     });
@@ -35,6 +46,15 @@ describe("graphql", () => {
   it("should get companies", () => {
     return test
       .get(`/graphql?query={getCompanies{name}}`)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.getCompanies.length, 8);
+      });
+  });
+
+  it("should get companies with paging - offset: 3, limit: 3", () => {
+    return test
+      .get(`/graphql?query={getCompanies(offset: 3, limit: 3){name}}`)
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.getCompanies.length, 3);
@@ -55,7 +75,16 @@ describe("graphql", () => {
       .get(`/graphql?query={getPeople{firstname}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getPeople.length, 2);
+        assert.equal(res.body.data.getPeople.length, 8);
+      });
+  });
+
+  it("should get people with paging - offset: 3, limit: 3", () => {
+    return test
+      .get(`/graphql?query={getPeople(offset: 3, limit: 3){firstname}}`)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.getPeople.length, 3);
       });
   });
 

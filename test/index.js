@@ -44,11 +44,29 @@ describe("graphql", () => {
   });
 
   it("should get companies", () => {
+    const postData = {
+      query: `query getComanies($sort: CompanySortType){
+        getCompanies( sort: $sort){
+          id,
+          name,
+          employees {
+            id
+          }
+        }
+      }`,
+      variables: {
+        sort: "ID"
+      }
+    };
     return test
-      .get(`/graphql?query={getCompanies{name}}`)
+      .post(`/graphql?`)
+      .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getCompanies.length, 8);
+        const length = res.body.data.getCompanies.length;
+        assert.equal(length, 8);
+        assert.equal(res.body.data.getCompanies[0].id, 1);
+        assert.equal(res.body.data.getCompanies[length-1].id, 8);
       });
   });
 
@@ -71,11 +89,30 @@ describe("graphql", () => {
   });
 
   it("should get people", () => {
+    const postData = {
+      query: `query getPeople($sort: PersonSortType){
+        getPeople( sort: $sort){
+          id,
+          firstname,
+          lastname,
+          age,
+          salary,
+          birthdate
+        }
+      }`,
+      variables: {
+        sort: "ID"
+      }
+    };
     return test
-      .get(`/graphql?query={getPeople{firstname}}`)
+      .post(`/graphql?`)
+      .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getPeople.length, 8);
+        const length = res.body.data.getPeople.length;
+        assert.equal(length, 8);
+        assert.equal(res.body.data.getPeople[0].id, 1);
+        assert.equal(res.body.data.getPeople[length-1].id, 8);
       });
   });
 

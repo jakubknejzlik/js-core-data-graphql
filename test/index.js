@@ -45,7 +45,7 @@ describe("graphql", () => {
 
   it("should get companies", () => {
     const postData = {
-      query: `query getComanies($sort: CompanySortType){
+      query: `query getComanies($sort: [CompanySortType!]){
         getCompanies( sort: $sort){
           id,
           name,
@@ -55,7 +55,7 @@ describe("graphql", () => {
         }
       }`,
       variables: {
-        sort: "ID"
+        sort: ["ID"]
       }
     };
     return test
@@ -90,7 +90,7 @@ describe("graphql", () => {
 
   it("should get people", () => {
     const postData = {
-      query: `query getPeople($sort: PersonSortType){
+      query: `query getPeople($sort: [PersonSortType!]){
         getPeople( sort: $sort){
           id,
           firstname,
@@ -101,7 +101,7 @@ describe("graphql", () => {
         }
       }`,
       variables: {
-        sort: "ID"
+        sort: ["ID"]
       }
     };
     return test

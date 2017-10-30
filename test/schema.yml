@@ -11,9 +11,17 @@ Company:
 
 Person:
   columns:
+    identifier: uuid
     firstname: string
     lastname: string
     age: int
+    bio: text
+    something: double
+    gender:
+      type: enum
+      values:
+        - male
+        - female
     salary:
       type: decimal
     birthdate: date

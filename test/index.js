@@ -18,26 +18,26 @@ const test = supertest(app);
 
 describe("graphql", () => {
   beforeEach(() => {
-    return database.syncSchema({force: true}).then(() => {
+    return database.syncSchema({ force: true }).then(() => {
       const context = database.createContext();
 
-      context.create("Company", {name: "test"});
-      context.create("Company", {name: "test2"});
-      context.create("Company", {name: "test3"});
-      context.create("Company", {name: "test4"});
-      context.create("Company", {name: "test5"});
-      context.create("Company", {name: "test6"});
-      context.create("Company", {name: "test7"});
-      context.create("Company", {name: "test8"});
+      context.create("Company", { name: "test" });
+      context.create("Company", { name: "test2" });
+      context.create("Company", { name: "test3" });
+      context.create("Company", { name: "test4" });
+      context.create("Company", { name: "test5" });
+      context.create("Company", { name: "test6" });
+      context.create("Company", { name: "test7" });
+      context.create("Company", { name: "test8" });
 
-      context.create("Person", {firstname: "john", lastname: "Doe"});
-      context.create("Person", {firstname: "Jane", lastname: "Siri"});
-      context.create("Person", {firstname: "FN 3", lastname: "LN 3"});
-      context.create("Person", {firstname: "FN 4", lastname: "LN 4"});
-      context.create("Person", {firstname: "FN 5", lastname: "LN 5"});
-      context.create("Person", {firstname: "FN 6", lastname: "LN 6"});
-      context.create("Person", {firstname: "FN 7", lastname: "LN 7"});
-      context.create("Person", {firstname: "FN 8", lastname: "LN 8"});
+      context.create("Person", { firstname: "john", lastname: "Doe" });
+      context.create("Person", { firstname: "Jane", lastname: "Siri" });
+      context.create("Person", { firstname: "FN 3", lastname: "LN 3" });
+      context.create("Person", { firstname: "FN 4", lastname: "LN 4" });
+      context.create("Person", { firstname: "FN 5", lastname: "LN 5" });
+      context.create("Person", { firstname: "FN 6", lastname: "LN 6" });
+      context.create("Person", { firstname: "FN 7", lastname: "LN 7" });
+      context.create("Person", { firstname: "FN 8", lastname: "LN 8" });
 
       return context.save();
     });
@@ -66,7 +66,7 @@ describe("graphql", () => {
         const length = res.body.data.getCompanies.length;
         assert.equal(length, 8);
         assert.equal(res.body.data.getCompanies[0].id, 1);
-        assert.equal(res.body.data.getCompanies[length-1].id, 8);
+        assert.equal(res.body.data.getCompanies[length - 1].id, 8);
       });
   });
 
@@ -112,7 +112,7 @@ describe("graphql", () => {
         const length = res.body.data.getPeople.length;
         assert.equal(length, 8);
         assert.equal(res.body.data.getPeople[0].id, 1);
-        assert.equal(res.body.data.getPeople[length-1].id, 8);
+        assert.equal(res.body.data.getPeople[length - 1].id, 8);
       });
   });
 
@@ -132,7 +132,7 @@ describe("graphql", () => {
       .then(res => {
         assert.equal(res.body.data.getPerson.id, 1);
       });
-  })
+  });
 
   it("delete a company by id", () => {
     let postData = {
@@ -194,7 +194,7 @@ describe("graphql", () => {
             }`,
       variables: {
         input: {
-          name: 'Company A'
+          name: "Company A"
         }
       }
     };
@@ -206,7 +206,7 @@ describe("graphql", () => {
       .then(res => {
         assert.equal(res.body.data.createCompany.name, "Company A");
       });
-  })
+  });
 
   it("create a person", () => {
     let postData = {
@@ -221,11 +221,11 @@ describe("graphql", () => {
             }`,
       variables: {
         input: {
-          firstname: 'FN',
-          lastname: 'LN',
+          firstname: "FN",
+          lastname: "LN",
           age: 20,
           salary: 20,
-          birthdate: new Date('01/01/2017')
+          birthdate: new Date("01/01/2017")
         }
       }
     };
@@ -239,7 +239,10 @@ describe("graphql", () => {
         assert.equal(res.body.data.createPerson.lastname, "LN");
         assert.equal(res.body.data.createPerson.age, 20);
         assert.equal(res.body.data.createPerson.salary, 20);
-        assert.equal(res.body.data.createPerson.birthdate, new Date('01/01/2017'));
+        assert.equal(
+          res.body.data.createPerson.birthdate,
+          new Date("01/01/2017")
+        );
       });
   });
 
@@ -254,7 +257,7 @@ describe("graphql", () => {
       variables: {
         input: {
           id: 1,
-          name: 'Company A'
+          name: "Company A"
         }
       }
     };
@@ -266,7 +269,8 @@ describe("graphql", () => {
       .then(res => {
         assert.equal(res.body.data.updateCompany.id, 1);
         assert.equal(res.body.data.updateCompany.name, "Company A");
-      }).then(() => {
+      })
+      .then(() => {
         return test
           .get(`/graphql?query={getCompany(id:1){id, name}}`)
           .expect(200)
@@ -275,7 +279,7 @@ describe("graphql", () => {
             assert.equal(res.body.data.getCompany.name, "Company A");
           });
       });
-  })
+  });
 
   it("update a person", () => {
     let postData = {
@@ -292,11 +296,11 @@ describe("graphql", () => {
       variables: {
         input: {
           id: 1,
-          firstname: 'FN',
-          lastname: 'LN',
+          firstname: "FN",
+          lastname: "LN",
           age: 20,
           salary: 20,
-          birthdate: new Date('01/02/2017')
+          birthdate: new Date("01/02/2017")
         }
       }
     };
@@ -311,10 +315,16 @@ describe("graphql", () => {
         assert.equal(res.body.data.updatePerson.lastname, "LN");
         assert.equal(res.body.data.updatePerson.age, 20);
         assert.equal(res.body.data.updatePerson.salary, 20);
-        assert.equal(res.body.data.updatePerson.birthdate, new Date('01/02/2017'));
-      }).then(() => {
+        assert.equal(
+          res.body.data.updatePerson.birthdate,
+          new Date("01/02/2017")
+        );
+      })
+      .then(() => {
         return test
-          .get(`/graphql?query={getPerson(id:1){id, firstname, lastname, age, salary, birthdate}}`)
+          .get(
+            `/graphql?query={getPerson(id:1){id, firstname, lastname, age, salary, birthdate}}`
+          )
           .expect(200)
           .then(res => {
             assert.equal(res.body.data.getPerson.id, 1);
@@ -322,8 +332,11 @@ describe("graphql", () => {
             assert.equal(res.body.data.getPerson.lastname, "LN");
             assert.equal(res.body.data.getPerson.age, 20);
             assert.equal(res.body.data.getPerson.salary, 20);
-            assert.equal(res.body.data.getPerson.birthdate, new Date('01/02/2017'));
+            assert.equal(
+              res.body.data.getPerson.birthdate,
+              new Date("01/02/2017")
+            );
           });
       });
-  })
+  });
 });

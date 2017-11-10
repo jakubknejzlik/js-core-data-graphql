@@ -16,6 +16,7 @@ Person:
     firstname: string
     lastname: string
     age: int
+    eyesCount: integer
     bio: text
     email: email
     vip: boolean

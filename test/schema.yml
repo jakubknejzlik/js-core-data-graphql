@@ -3,6 +3,7 @@ Company:
     name:
       type: string
       required: true
+    certified: bool
   relationships:
     employees:
       entity: Person
@@ -16,6 +17,8 @@ Person:
     lastname: string
     age: int
     bio: text
+    email: email
+    vip: boolean
     something: double
     gender:
       type: enum

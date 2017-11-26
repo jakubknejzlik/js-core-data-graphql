@@ -339,4 +339,98 @@ describe("graphql", () => {
           });
       });
   });
+
+  it("create company and person in one mutation", () => {
+    let postData = {
+      query: `mutation ($person: PersonCreateInputType, $company: CompanyCreateInputType){
+                createPerson(input: $person){
+                  firstname,
+                  lastname,
+                  age,
+                  salary,
+                  birthdate
+                }
+                createCompany(input: $company){
+                  id,
+                  name
+                }
+            }`,
+      variables: {
+        person: {
+          firstname: "FN",
+          lastname: "LN",
+          age: 20,
+          salary: 20,
+          birthdate: new Date("01/01/2017")
+        },
+        company: {
+          name: "Company A"
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.createPerson.firstname, "FN");
+        assert.equal(res.body.data.createPerson.lastname, "LN");
+        assert.equal(res.body.data.createPerson.age, 20);
+        assert.equal(res.body.data.createPerson.salary, 20);
+        assert.equal(
+          res.body.data.createPerson.birthdate,
+          new Date("01/01/2017")
+        );
+        assert.equal(res.body.data.createCompany.name, "Company A");
+      });
+  });
+
+  it("update company and person in one mutation", () => {
+    let postData = {
+      query: `mutation ($person: PersonUpdateInputType, $company: CompanyUpdateInputType){
+                updatePerson(input: $person){
+                  firstname,
+                  lastname,
+                  age,
+                  salary,
+                  birthdate
+                }
+                updateCompany(input: $company){
+                  id,
+                  name
+                }
+            }`,
+      variables: {
+        person: {
+          id: 1,
+          firstname: "AA",
+          lastname: "BB",
+          age: 20,
+          salary: 20,
+          birthdate: new Date("01/01/2017")
+        },
+        company: {
+          id: 1,
+          name: "Company B"
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.updatePerson.firstname, "AA");
+        assert.equal(res.body.data.updatePerson.lastname, "BB");
+        assert.equal(res.body.data.updatePerson.age, 20);
+        assert.equal(res.body.data.updatePerson.salary, 20);
+        assert.equal(
+          res.body.data.updatePerson.birthdate,
+          new Date("01/01/2017")
+        );
+        assert.equal(res.body.data.updateCompany.name, "Company B");
+      });
+  });
 });

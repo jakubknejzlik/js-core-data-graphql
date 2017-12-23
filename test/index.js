@@ -45,8 +45,8 @@ describe("graphql", () => {
 
   it("should get companies", () => {
     const postData = {
-      query: `query getComanies($sort: [CompanySortType!]){
-        getCompanies( sort: $sort){
+      query: `query companies($sort: [CompanySortType!]){
+        companies( sort: $sort){
           id,
           name,
           employees {
@@ -63,35 +63,35 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        const length = res.body.data.getCompanies.length;
+        const length = res.body.data.companies.length;
         assert.equal(length, 8);
-        assert.equal(res.body.data.getCompanies[0].id, 1);
-        assert.equal(res.body.data.getCompanies[length - 1].id, 8);
+        assert.equal(res.body.data.companies[0].id, 1);
+        assert.equal(res.body.data.companies[length - 1].id, 8);
       });
   });
 
   it("should get companies with paging - offset: 3, limit: 3", () => {
     return test
-      .get(`/graphql?query={getCompanies(offset: 3, limit: 3){name}}`)
+      .get(`/graphql?query={companies(offset: 3, limit: 3){name}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getCompanies.length, 3);
+        assert.equal(res.body.data.companies.length, 3);
       });
   });
 
   it("should get a company", () => {
     return test
-      .get(`/graphql?query={getCompany(id:1){id}}`)
+      .get(`/graphql?query={company(id:1){id}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getCompany.id, 1);
+        assert.equal(res.body.data.company.id, 1);
       });
   });
 
   it("should get people", () => {
     const postData = {
-      query: `query getPeople($sort: [PersonSortType!]){
-        getPeople( sort: $sort){
+      query: `query people($sort: [PersonSortType!]){
+        people( sort: $sort){
           id,
           firstname,
           lastname,
@@ -109,28 +109,28 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        const length = res.body.data.getPeople.length;
+        const length = res.body.data.people.length;
         assert.equal(length, 8);
-        assert.equal(res.body.data.getPeople[0].id, 1);
-        assert.equal(res.body.data.getPeople[length - 1].id, 8);
+        assert.equal(res.body.data.people[0].id, 1);
+        assert.equal(res.body.data.people[length - 1].id, 8);
       });
   });
 
   it("should get people with paging - offset: 3, limit: 3", () => {
     return test
-      .get(`/graphql?query={getPeople(offset: 3, limit: 3){firstname}}`)
+      .get(`/graphql?query={people(offset: 3, limit: 3){firstname}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getPeople.length, 3);
+        assert.equal(res.body.data.people.length, 3);
       });
   });
 
   it("should get person", () => {
     return test
-      .get(`/graphql?query={getPerson(id:1){id}}`)
+      .get(`/graphql?query={person(id:1){id}}`)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.getPerson.id, 1);
+        assert.equal(res.body.data.person.id, 1);
       });
   });
 
@@ -272,11 +272,11 @@ describe("graphql", () => {
       })
       .then(() => {
         return test
-          .get(`/graphql?query={getCompany(id:1){id, name}}`)
+          .get(`/graphql?query={company(id:1){id, name}}`)
           .expect(200)
           .then(res => {
-            assert.equal(res.body.data.getCompany.id, 1);
-            assert.equal(res.body.data.getCompany.name, "Company A");
+            assert.equal(res.body.data.company.id, 1);
+            assert.equal(res.body.data.company.name, "Company A");
           });
       });
   });
@@ -323,17 +323,17 @@ describe("graphql", () => {
       .then(() => {
         return test
           .get(
-            `/graphql?query={getPerson(id:1){id, firstname, lastname, age, salary, birthdate}}`
+            `/graphql?query={person(id:1){id, firstname, lastname, age, salary, birthdate}}`
           )
           .expect(200)
           .then(res => {
-            assert.equal(res.body.data.getPerson.id, 1);
-            assert.equal(res.body.data.getPerson.firstname, "FN");
-            assert.equal(res.body.data.getPerson.lastname, "LN");
-            assert.equal(res.body.data.getPerson.age, 20);
-            assert.equal(res.body.data.getPerson.salary, 20);
+            assert.equal(res.body.data.person.id, 1);
+            assert.equal(res.body.data.person.firstname, "FN");
+            assert.equal(res.body.data.person.lastname, "LN");
+            assert.equal(res.body.data.person.age, 20);
+            assert.equal(res.body.data.person.salary, 20);
             assert.equal(
-              res.body.data.getPerson.birthdate,
+              res.body.data.person.birthdate,
               new Date("01/02/2017")
             );
           });

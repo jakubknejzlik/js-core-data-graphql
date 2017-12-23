@@ -12,7 +12,8 @@ database.createModelFromYaml(fs.readFileSync(__dirname + "/schema.yml"));
 
 const app = express();
 app.use(bodyParser.json());
-app.use("/graphql", lib.graphql(database));
+app.post("/graphql", lib.graphql(database));
+app.get("/graphql", lib.graphiql());
 
 const test = supertest(app);
 
@@ -41,6 +42,15 @@ describe("graphql", () => {
 
       return context.save();
     });
+  });
+
+  it("should get graphiql", () => {
+    return test
+      .get(`/graphql`)
+      .expect(200)
+      .then(res => {
+        assert.ok(res.text.indexOf("<title>GraphQL Playground</title>") !== -1);
+      });
   });
 
   it("should get companies", () => {
@@ -72,7 +82,8 @@ describe("graphql", () => {
 
   it("should get companies with paging - offset: 3, limit: 3", () => {
     return test
-      .get(`/graphql?query={companies(offset: 3, limit: 3){name}}`)
+      .post(`/graphql`)
+      .send({ query: `{companies(offset: 3, limit: 3){name}}` })
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.companies.length, 3);
@@ -81,7 +92,8 @@ describe("graphql", () => {
 
   it("should get a company", () => {
     return test
-      .get(`/graphql?query={company(id:1){id}}`)
+      .post(`/graphql`)
+      .send({ query: `{company(id:1){id}}` })
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.company.id, 1);
@@ -118,7 +130,8 @@ describe("graphql", () => {
 
   it("should get people with paging - offset: 3, limit: 3", () => {
     return test
-      .get(`/graphql?query={people(offset: 3, limit: 3){firstname}}`)
+      .post(`/graphql`)
+      .send({ query: `{people(offset: 3, limit: 3){firstname}}` })
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.people.length, 3);
@@ -127,7 +140,8 @@ describe("graphql", () => {
 
   it("should get person", () => {
     return test
-      .get(`/graphql?query={person(id:1){id}}`)
+      .post(`/graphql`)
+      .send({ query: `{person(id:1){id}}` })
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.person.id, 1);
@@ -272,7 +286,8 @@ describe("graphql", () => {
       })
       .then(() => {
         return test
-          .get(`/graphql?query={company(id:1){id, name}}`)
+          .post(`/graphql`)
+          .send({ query: `{company(id:1){id, name}}` })
           .expect(200)
           .then(res => {
             assert.equal(res.body.data.company.id, 1);
@@ -322,9 +337,10 @@ describe("graphql", () => {
       })
       .then(() => {
         return test
-          .get(
-            `/graphql?query={person(id:1){id, firstname, lastname, age, salary, birthdate}}`
-          )
+          .post(`/graphql`)
+          .send({
+            query: `{person(id:1){id, firstname, lastname, age, salary, birthdate}}`
+          })
           .expect(200)
           .then(res => {
             assert.equal(res.body.data.person.id, 1);

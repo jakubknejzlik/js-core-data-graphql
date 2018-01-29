@@ -7,7 +7,7 @@ Company:
     employees:
       entity: Person
       toMany: true
-      inverse: companies
+      inverse: company
 
 Person:
   columns:
@@ -18,7 +18,6 @@ Person:
       type: decimal
     birthdate: date
   relationships:
-    companies:
+    company:
       entity: Company
-      toMany: true
       inverse: employees

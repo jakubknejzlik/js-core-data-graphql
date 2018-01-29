@@ -56,11 +56,13 @@ describe("graphql", () => {
   it("should get companies", () => {
     const postData = {
       query: `query companies($sort: [CompanySortType!]){
-        companies( sort: $sort){
-          id,
-          name,
-          employees {
-            id
+        companies(sort: $sort){
+          items {
+            id,
+            name,
+            employees {
+              id
+            }
           }
         }
       }`,
@@ -73,20 +75,20 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        const length = res.body.data.companies.length;
+        const length = res.body.data.companies.items.length;
         assert.equal(length, 8);
-        assert.equal(res.body.data.companies[0].id, 1);
-        assert.equal(res.body.data.companies[length - 1].id, 8);
+        assert.equal(res.body.data.companies.items[0].id, 1);
+        assert.equal(res.body.data.companies.items[length - 1].id, 8);
       });
   });
 
   it("should get companies with paging - offset: 3, limit: 3", () => {
     return test
       .post(`/graphql`)
-      .send({ query: `{companies(offset: 3, limit: 3){name}}` })
+      .send({ query: `{companies(offset: 3, limit: 3){items{name}}}` })
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.companies.length, 3);
+        assert.equal(res.body.data.companies.items.length, 3);
       });
   });
 
@@ -104,12 +106,15 @@ describe("graphql", () => {
     const postData = {
       query: `query people($sort: [PersonSortType!]){
         people( sort: $sort){
-          id,
-          firstname,
-          lastname,
-          age,
-          salary,
-          birthdate
+          items{
+            id,
+            firstname,
+            lastname,
+            age,
+            salary,
+            birthdate
+          }
+          count
         }
       }`,
       variables: {
@@ -121,20 +126,21 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        const length = res.body.data.people.length;
+        const length = res.body.data.people.items.length;
+        assert.equal(res.body.data.people.count, 8);
         assert.equal(length, 8);
-        assert.equal(res.body.data.people[0].id, 1);
-        assert.equal(res.body.data.people[length - 1].id, 8);
+        assert.equal(res.body.data.people.items[0].id, 1);
+        assert.equal(res.body.data.people.items[length - 1].id, 8);
       });
   });
 
   it("should get people with paging - offset: 3, limit: 3", () => {
     return test
       .post(`/graphql`)
-      .send({ query: `{people(offset: 3, limit: 3){firstname}}` })
+      .send({ query: `{people(offset: 3, limit: 3){items{firstname}}}` })
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.people.length, 3);
+        assert.equal(res.body.data.people.items.length, 3);
       });
   });
 
@@ -204,11 +210,16 @@ describe("graphql", () => {
       query: `mutation createCompany($input:  CompanyCreateInputType){
                 createCompany(input: $input){
                   name
+                  employees_id
+                  employees {
+                    id
+                  }
                 }
             }`,
       variables: {
         input: {
-          name: "Company A"
+          name: "Company A",
+          employees_id: [1]
         }
       }
     };
@@ -219,6 +230,8 @@ describe("graphql", () => {
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.createCompany.name, "Company A");
+        assert.deepEqual(res.body.data.createCompany.employees_id, [1]);
+        assert.deepEqual(res.body.data.createCompany.employees, [{ id: 1 }]);
       });
   });
 
@@ -262,16 +275,18 @@ describe("graphql", () => {
 
   it("update a company", () => {
     let postData = {
-      query: `mutation updateCompany($input:  CompanyUpdateInputType){
-                updateCompany(input: $input){
+      query: `mutation updateCompany($id: Int!,$input:  CompanyUpdateInputType){
+                updateCompany(id: $id, input: $input){
                   id,
                   name
+                  employees_id
                 }
             }`,
       variables: {
+        id: 1,
         input: {
-          id: 1,
-          name: "Company A"
+          name: "Company A",
+          employees_id: [2]
         }
       }
     };
@@ -283,6 +298,7 @@ describe("graphql", () => {
       .then(res => {
         assert.equal(res.body.data.updateCompany.id, 1);
         assert.equal(res.body.data.updateCompany.name, "Company A");
+        assert.deepEqual(res.body.data.updateCompany.employees_id, [2]);
       })
       .then(() => {
         return test
@@ -298,24 +314,26 @@ describe("graphql", () => {
 
   it("update a person", () => {
     let postData = {
-      query: `mutation updatePerson($input:  PersonUpdateInputType){
-                updatePerson(input: $input){
+      query: `mutation updatePerson($id: Int!,$input:  PersonUpdateInputType){
+                updatePerson(id:$id,input: $input){
                   id,
                   firstname,
                   lastname,
                   age,
                   salary,
                   birthdate
+                  company_id
                 }
             }`,
       variables: {
+        id: 1,
         input: {
-          id: 1,
           firstname: "FN",
           lastname: "LN",
           age: 20,
           salary: 20,
-          birthdate: new Date("01/02/2017")
+          birthdate: new Date("01/02/2017"),
+          company_id: 2
         }
       }
     };
@@ -334,6 +352,7 @@ describe("graphql", () => {
           res.body.data.updatePerson.birthdate,
           new Date("01/02/2017")
         );
+        assert.equal(res.body.data.updatePerson.company_id, 2);
       })
       .then(() => {
         return test
@@ -404,30 +423,30 @@ describe("graphql", () => {
 
   it("update company and person in one mutation", () => {
     let postData = {
-      query: `mutation ($person: PersonUpdateInputType, $company: CompanyUpdateInputType){
-                updatePerson(input: $person){
+      query: `mutation ($personId:Int!,$person: PersonUpdateInputType, $companyId:Int!,$company: CompanyUpdateInputType){
+                updatePerson(id:$personId,input: $person){
                   firstname,
                   lastname,
                   age,
                   salary,
                   birthdate
                 }
-                updateCompany(input: $company){
+                updateCompany(id:$companyId,input: $company){
                   id,
                   name
                 }
             }`,
       variables: {
+        personId: 1,
         person: {
-          id: 1,
           firstname: "AA",
           lastname: "BB",
           age: 20,
           salary: 20,
           birthdate: new Date("01/01/2017")
         },
+        companyId: 1,
         company: {
-          id: 1,
           name: "Company B"
         }
       }

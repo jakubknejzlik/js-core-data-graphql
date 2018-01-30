@@ -312,6 +312,33 @@ describe("graphql", () => {
       });
   });
 
+  it("update a company with empty employees", () => {
+    let postData = {
+      query: `mutation updateCompany($id: Int!,$input:  CompanyUpdateInputType){
+                updateCompany(id: $id, input: $input){
+                  id,
+                  name
+                  employees_id
+                }
+            }`,
+      variables: {
+        id: 1,
+        input: {
+          name: "test",
+          employees_id: []
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.deepEqual(res.body.data.updateCompany.employees_id, []);
+      });
+  });
+
   it("update a person", () => {
     let postData = {
       query: `mutation updatePerson($id: Int!,$input:  PersonUpdateInputType){
@@ -372,6 +399,36 @@ describe("graphql", () => {
               new Date("01/02/2017")
             );
           });
+      });
+  });
+
+  it("update a person", () => {
+    let postData = {
+      query: `mutation updatePerson($id: Int!,$input:  PersonUpdateInputType){
+                updatePerson(id:$id,input: $input){
+                  id,
+                  firstname,
+                  lastname,
+                  age,
+                  salary,
+                  birthdate
+                  company_id
+                }
+            }`,
+      variables: {
+        id: 1,
+        input: {
+          company_id: null
+        }
+      }
+    };
+
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.updatePerson.company_id, null);
       });
   });
 

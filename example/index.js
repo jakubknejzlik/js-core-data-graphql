@@ -7,7 +7,7 @@ const cors = require("cors");
 const lib = require("../index");
 const seed = require("./seed");
 
-const database = new CoreData("sqlite://:memory:");
+const database = new CoreData("sqlite://:memory:", { logging: false });
 database.createModelFromYaml(fs.readFileSync(__dirname + "/schema.yml"));
 
 const app = express();

@@ -56,7 +56,7 @@ describe("graphql", () => {
   it("should get companies", () => {
     const postData = {
       query: `query companies($sort: [CompanySortType!]){
-        companies(sort: $sort){
+        companies(sort: $sort, filter:{name:"test"}){
           items {
             id,
             name,
@@ -76,9 +76,10 @@ describe("graphql", () => {
       .expect(200)
       .then(res => {
         const length = res.body.data.companies.items.length;
-        assert.equal(length, 8);
-        assert.equal(res.body.data.companies.items[0].id, 1);
+        assert.equal(length, 1);
+        assert.equal(res.body.data.companies.items[0].id, 8);
         assert.equal(res.body.data.companies.items[length - 1].id, 8);
+        assert.equal(res.body.data.companies.items[0].name, "test");
       });
   });
 

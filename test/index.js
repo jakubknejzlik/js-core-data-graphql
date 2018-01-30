@@ -119,7 +119,7 @@ describe("graphql", () => {
         }
       }`,
       variables: {
-        sort: ["ID"]
+        sort: ["ID_DESC"]
       }
     };
     return test
@@ -130,8 +130,8 @@ describe("graphql", () => {
         const length = res.body.data.people.items.length;
         assert.equal(res.body.data.people.count, 8);
         assert.equal(length, 8);
-        assert.equal(res.body.data.people.items[0].id, 1);
-        assert.equal(res.body.data.people.items[length - 1].id, 8);
+        assert.equal(res.body.data.people.items[0].id, 8);
+        assert.equal(res.body.data.people.items[length - 1].id, 1);
       });
   });
 

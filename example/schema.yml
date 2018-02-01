@@ -3,6 +3,7 @@ Company:
     name:
       type: string
       required: true
+    createdAt: date
   relationships:
     employees:
       entity: Person

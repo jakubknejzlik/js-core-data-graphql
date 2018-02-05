@@ -4,6 +4,7 @@ const CoreData = require("js-core-data");
 const supertest = require("supertest");
 const express = require("express");
 const bodyParser = require("body-parser");
+const moment = require("moment");
 
 const lib = require("../index");
 
@@ -269,7 +270,7 @@ describe("graphql", () => {
         assert.equal(res.body.data.createPerson.salary, 20);
         assert.equal(
           res.body.data.createPerson.birthdate,
-          new Date("01/01/2017")
+          moment(new Date("01/01/2017")).toISOString()
         );
       });
   });
@@ -378,7 +379,7 @@ describe("graphql", () => {
         assert.equal(res.body.data.updatePerson.salary, 20);
         assert.equal(
           res.body.data.updatePerson.birthdate,
-          new Date("01/02/2017")
+          moment(new Date("01/02/2017")).toISOString()
         );
         assert.equal(res.body.data.updatePerson.company_id, 2);
       })
@@ -397,7 +398,7 @@ describe("graphql", () => {
             assert.equal(res.body.data.person.salary, 20);
             assert.equal(
               res.body.data.person.birthdate,
-              new Date("01/02/2017")
+              moment(new Date("01/02/2017")).toISOString()
             );
           });
       });
@@ -473,7 +474,7 @@ describe("graphql", () => {
         assert.equal(res.body.data.createPerson.salary, 20);
         assert.equal(
           res.body.data.createPerson.birthdate,
-          new Date("01/01/2017")
+          moment(new Date("01/01/2017")).toISOString()
         );
         assert.equal(res.body.data.createCompany.name, "Company A");
       });
@@ -521,7 +522,7 @@ describe("graphql", () => {
         assert.equal(res.body.data.updatePerson.salary, 20);
         assert.equal(
           res.body.data.updatePerson.birthdate,
-          new Date("01/01/2017")
+          moment(new Date("01/01/2017")).toISOString()
         );
         assert.equal(res.body.data.updateCompany.name, "Company B");
       });

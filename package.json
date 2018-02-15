@@ -20,7 +20,7 @@
   "devDependencies": {
     "cors": "^2.8.3",
     "express": "^4.15.3",
-    "js-core-data": "^1.6.4",
+    "js-core-data": "^1.9.0",
     "mocha": "^3.4.2",
     "sqlite3": "^3.1.8",
     "supertest": "^3.0.0"

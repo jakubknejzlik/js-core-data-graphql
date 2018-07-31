@@ -1,60 +1,60 @@
-const assert = require("assert");
-const fs = require("fs");
-const CoreData = require("js-core-data");
-const supertest = require("supertest");
-const express = require("express");
-const bodyParser = require("body-parser");
-const moment = require("moment");
+const assert = require('assert');
+const fs = require('fs');
+const CoreData = require('js-core-data');
+const supertest = require('supertest');
+const express = require('express');
+const bodyParser = require('body-parser');
+const moment = require('moment');
 
-const lib = require("../index");
+const lib = require('../index');
 
-const database = new CoreData("sqlite://:memory:");
-database.createModelFromYaml(fs.readFileSync(__dirname + "/schema.yml"));
+const database = new CoreData('sqlite://:memory:');
+database.createModelFromYaml(fs.readFileSync(__dirname + '/schema.yml'));
 
 const app = express();
 app.use(bodyParser.json());
-app.post("/graphql", lib.graphql(database));
-app.get("/graphql", lib.graphiql());
+app.post('/graphql', lib.graphql(database));
+app.get('/graphql', lib.graphiql());
 
 const test = supertest(app);
 
-describe("graphql", () => {
+describe('graphql', () => {
   beforeEach(() => {
     return database.syncSchema({ force: true }).then(() => {
       const context = database.createContext();
 
-      context.create("Company", { name: "test" });
-      context.create("Company", { name: "test2" });
-      context.create("Company", { name: "test3" });
-      context.create("Company", { name: "test4" });
-      context.create("Company", { name: "test5" });
-      context.create("Company", { name: "test6" });
-      context.create("Company", { name: "test7" });
-      context.create("Company", { name: "test8" });
+      context.create('Company', { name: 'test' });
+      context.create('Company', { name: 'test2' });
+      context.create('Company', { name: 'test3' });
+      context.create('Company', { name: 'test4' });
+      context.create('Company', { name: 'test5' });
+      context.create('Company', { name: 'test6' });
+      context.create('Company', { name: 'test7' });
+      context.create('Company', { name: 'test8' });
 
-      context.create("Person", { firstname: "john", lastname: "Doe" });
-      context.create("Person", { firstname: "Jane", lastname: "Siri" });
-      context.create("Person", { firstname: "FN 3", lastname: "LN 3" });
-      context.create("Person", { firstname: "FN 4", lastname: "LN 4" });
-      context.create("Person", { firstname: "FN 5", lastname: "LN 5" });
-      context.create("Person", { firstname: "FN 6", lastname: "LN 6" });
-      context.create("Person", { firstname: "FN 7", lastname: "LN 7" });
-      context.create("Person", { firstname: "FN 8", lastname: "LN 8" });
+      context.create('Person', { firstname: 'john', lastname: 'Doe' });
+      context.create('Person', { firstname: 'Jane', lastname: 'Siri' });
+      context.create('Person', { firstname: 'FN 3', lastname: 'LN 3' });
+      context.create('Person', { firstname: 'FN 4', lastname: 'LN 4' });
+      context.create('Person', { firstname: 'FN 5', lastname: 'LN 5' });
+      context.create('Person', { firstname: 'FN 6', lastname: 'LN 6' });
+      context.create('Person', { firstname: 'FN 7', lastname: 'LN 7' });
+      context.create('Person', { firstname: 'FN 8', lastname: 'LN 8' });
 
       return context.save();
     });
   });
 
-  it("should get graphiql", () => {
+  it('should get graphiql', () => {
     return test
       .get(`/graphql`)
       .expect(200)
       .then(res => {
-        assert.ok(res.text.indexOf("<title>GraphQL Playground</title>") !== -1);
+        assert.ok(res.text.indexOf('<title>GraphQL Playground</title>') !== -1);
       });
   });
 
-  it("should get companies", () => {
+  it('should get companies', () => {
     const postData = {
       query: `query companies($sort: [CompanySortType!]){
         companies(sort: $sort, filter:{name:"test"}){
@@ -68,7 +68,7 @@ describe("graphql", () => {
         }
       }`,
       variables: {
-        sort: ["ID"]
+        sort: ['ID']
       }
     };
     return test
@@ -80,11 +80,39 @@ describe("graphql", () => {
         assert.equal(length, 1);
         assert.equal(res.body.data.companies.items[0].id, 8);
         assert.equal(res.body.data.companies.items[length - 1].id, 8);
-        assert.equal(res.body.data.companies.items[0].name, "test");
+        assert.equal(res.body.data.companies.items[0].name, 'test');
+      });
+  });
+  it('should get companies reversed', () => {
+    const postData = {
+      query: `query companies($sort: [CompanySortType!]){
+        companies(sort: $sort){
+          items {
+            id,
+            name,
+            employees {
+              id
+            }
+          }
+        }
+      }`,
+      variables: {
+        sort: ['ID_DESC', 'NAME']
+      }
+    };
+    return test
+      .post(`/graphql?`)
+      .send(postData)
+      .expect(200)
+      .then(res => {
+        const length = res.body.data.companies.items.length;
+        assert.equal(length, 8);
+        assert.equal(res.body.data.companies.items[0].id, 8);
+        assert.equal(res.body.data.companies.items[length - 1].id, 1);
       });
   });
 
-  it("should get companies with paging - offset: 3, limit: 3", () => {
+  it('should get companies with paging - offset: 3, limit: 3', () => {
     return test
       .post(`/graphql`)
       .send({ query: `{companies(offset: 3, limit: 3){items{name}}}` })
@@ -94,7 +122,7 @@ describe("graphql", () => {
       });
   });
 
-  it("should get a company", () => {
+  it('should get a company', () => {
     return test
       .post(`/graphql`)
       .send({ query: `{company(id:1){id}}` })
@@ -104,7 +132,7 @@ describe("graphql", () => {
       });
   });
 
-  it("should get people", () => {
+  it('should get people', () => {
     const postData = {
       query: `query people($sort: [PersonSortType!]){
         people( sort: $sort){
@@ -120,7 +148,7 @@ describe("graphql", () => {
         }
       }`,
       variables: {
-        sort: ["ID_DESC"]
+        sort: ['ID_DESC']
       }
     };
     return test
@@ -136,7 +164,7 @@ describe("graphql", () => {
       });
   });
 
-  it("should get people with paging - offset: 3, limit: 3", () => {
+  it('should get people with paging - offset: 3, limit: 3', () => {
     return test
       .post(`/graphql`)
       .send({ query: `{people(offset: 3, limit: 3){items{firstname}}}` })
@@ -146,7 +174,7 @@ describe("graphql", () => {
       });
   });
 
-  it("should get person", () => {
+  it('should get person', () => {
     return test
       .post(`/graphql`)
       .send({ query: `{person(id:1){id}}` })
@@ -156,7 +184,7 @@ describe("graphql", () => {
       });
   });
 
-  it("delete a company by id", () => {
+  it('delete a company by id', () => {
     let postData = {
       query: `mutation deleteCompany($id: Int){
                 deleteCompany(id: $id){
@@ -181,7 +209,7 @@ describe("graphql", () => {
       });
   });
 
-  it("delete a person by id", () => {
+  it('delete a person by id', () => {
     let postData = {
       query: `mutation deletePerson($id: Int){
                 deletePerson(id: $id){
@@ -207,7 +235,7 @@ describe("graphql", () => {
       });
   });
 
-  it("create a company", () => {
+  it('create a company', () => {
     let postData = {
       query: `mutation createCompany($input:  CompanyCreateInputType){
                 createCompany(input: $input){
@@ -220,7 +248,7 @@ describe("graphql", () => {
             }`,
       variables: {
         input: {
-          name: "Company A",
+          name: 'Company A',
           employees_id: [1]
         }
       }
@@ -231,13 +259,13 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.createCompany.name, "Company A");
+        assert.equal(res.body.data.createCompany.name, 'Company A');
         assert.deepEqual(res.body.data.createCompany.employees_id, [1]);
         assert.deepEqual(res.body.data.createCompany.employees, [{ id: 1 }]);
       });
   });
 
-  it("create a person", () => {
+  it('create a person', () => {
     let postData = {
       query: `mutation createPerson($input:  PersonCreateInputType){
                 createPerson(input: $input){
@@ -250,11 +278,11 @@ describe("graphql", () => {
             }`,
       variables: {
         input: {
-          firstname: "FN",
-          lastname: "LN",
+          firstname: 'FN',
+          lastname: 'LN',
           age: 20,
           salary: 20,
-          birthdate: new Date("01/01/2017")
+          birthdate: new Date('01/01/2017')
         }
       }
     };
@@ -264,18 +292,18 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.createPerson.firstname, "FN");
-        assert.equal(res.body.data.createPerson.lastname, "LN");
+        assert.equal(res.body.data.createPerson.firstname, 'FN');
+        assert.equal(res.body.data.createPerson.lastname, 'LN');
         assert.equal(res.body.data.createPerson.age, 20);
         assert.equal(res.body.data.createPerson.salary, 20);
         assert.equal(
           res.body.data.createPerson.birthdate,
-          moment(new Date("01/01/2017")).toISOString()
+          moment(new Date('01/01/2017')).toISOString()
         );
       });
   });
 
-  it("update a company", () => {
+  it('update a company', () => {
     let postData = {
       query: `mutation updateCompany($id: Int!,$input:  CompanyUpdateInputType){
                 updateCompany(id: $id, input: $input){
@@ -287,7 +315,7 @@ describe("graphql", () => {
       variables: {
         id: 1,
         input: {
-          name: "Company A",
+          name: 'Company A',
           employees_id: [2]
         }
       }
@@ -299,7 +327,7 @@ describe("graphql", () => {
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.updateCompany.id, 1);
-        assert.equal(res.body.data.updateCompany.name, "Company A");
+        assert.equal(res.body.data.updateCompany.name, 'Company A');
         assert.deepEqual(res.body.data.updateCompany.employees_id, [2]);
       })
       .then(() => {
@@ -309,12 +337,12 @@ describe("graphql", () => {
           .expect(200)
           .then(res => {
             assert.equal(res.body.data.company.id, 1);
-            assert.equal(res.body.data.company.name, "Company A");
+            assert.equal(res.body.data.company.name, 'Company A');
           });
       });
   });
 
-  it("update a company with empty employees", () => {
+  it('update a company with empty employees', () => {
     let postData = {
       query: `mutation updateCompany($id: Int!,$input:  CompanyUpdateInputType){
                 updateCompany(id: $id, input: $input){
@@ -326,7 +354,7 @@ describe("graphql", () => {
       variables: {
         id: 1,
         input: {
-          name: "test",
+          name: 'test',
           employees_id: []
         }
       }
@@ -341,7 +369,7 @@ describe("graphql", () => {
       });
   });
 
-  it("update a person", () => {
+  it('update a person', () => {
     let postData = {
       query: `mutation updatePerson($id: Int!,$input:  PersonUpdateInputType){
                 updatePerson(id:$id,input: $input){
@@ -357,11 +385,11 @@ describe("graphql", () => {
       variables: {
         id: 1,
         input: {
-          firstname: "FN",
-          lastname: "LN",
+          firstname: 'FN',
+          lastname: 'LN',
           age: 20,
           salary: 20,
-          birthdate: new Date("01/02/2017"),
+          birthdate: new Date('01/02/2017'),
           company_id: 2
         }
       }
@@ -373,13 +401,13 @@ describe("graphql", () => {
       .expect(200)
       .then(res => {
         assert.equal(res.body.data.updatePerson.id, 1);
-        assert.equal(res.body.data.updatePerson.firstname, "FN");
-        assert.equal(res.body.data.updatePerson.lastname, "LN");
+        assert.equal(res.body.data.updatePerson.firstname, 'FN');
+        assert.equal(res.body.data.updatePerson.lastname, 'LN');
         assert.equal(res.body.data.updatePerson.age, 20);
         assert.equal(res.body.data.updatePerson.salary, 20);
         assert.equal(
           res.body.data.updatePerson.birthdate,
-          moment(new Date("01/02/2017")).toISOString()
+          moment(new Date('01/02/2017')).toISOString()
         );
         assert.equal(res.body.data.updatePerson.company_id, 2);
       })
@@ -392,19 +420,19 @@ describe("graphql", () => {
           .expect(200)
           .then(res => {
             assert.equal(res.body.data.person.id, 1);
-            assert.equal(res.body.data.person.firstname, "FN");
-            assert.equal(res.body.data.person.lastname, "LN");
+            assert.equal(res.body.data.person.firstname, 'FN');
+            assert.equal(res.body.data.person.lastname, 'LN');
             assert.equal(res.body.data.person.age, 20);
             assert.equal(res.body.data.person.salary, 20);
             assert.equal(
               res.body.data.person.birthdate,
-              moment(new Date("01/02/2017")).toISOString()
+              moment(new Date('01/02/2017')).toISOString()
             );
           });
       });
   });
 
-  it("update a person", () => {
+  it('update a person', () => {
     let postData = {
       query: `mutation updatePerson($id: Int!,$input:  PersonUpdateInputType){
                 updatePerson(id:$id,input: $input){
@@ -434,7 +462,7 @@ describe("graphql", () => {
       });
   });
 
-  it("create company and person in one mutation", () => {
+  it('create company and person in one mutation', () => {
     let postData = {
       query: `mutation ($person: PersonCreateInputType, $company: CompanyCreateInputType){
                 createPerson(input: $person){
@@ -451,14 +479,14 @@ describe("graphql", () => {
             }`,
       variables: {
         person: {
-          firstname: "FN",
-          lastname: "LN",
+          firstname: 'FN',
+          lastname: 'LN',
           age: 20,
           salary: 20,
-          birthdate: new Date("01/01/2017")
+          birthdate: new Date('01/01/2017')
         },
         company: {
-          name: "Company A"
+          name: 'Company A'
         }
       }
     };
@@ -468,19 +496,19 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.createPerson.firstname, "FN");
-        assert.equal(res.body.data.createPerson.lastname, "LN");
+        assert.equal(res.body.data.createPerson.firstname, 'FN');
+        assert.equal(res.body.data.createPerson.lastname, 'LN');
         assert.equal(res.body.data.createPerson.age, 20);
         assert.equal(res.body.data.createPerson.salary, 20);
         assert.equal(
           res.body.data.createPerson.birthdate,
-          moment(new Date("01/01/2017")).toISOString()
+          moment(new Date('01/01/2017')).toISOString()
         );
-        assert.equal(res.body.data.createCompany.name, "Company A");
+        assert.equal(res.body.data.createCompany.name, 'Company A');
       });
   });
 
-  it("update company and person in one mutation", () => {
+  it('update company and person in one mutation', () => {
     let postData = {
       query: `mutation ($personId:Int!,$person: PersonUpdateInputType, $companyId:Int!,$company: CompanyUpdateInputType){
                 updatePerson(id:$personId,input: $person){
@@ -498,15 +526,15 @@ describe("graphql", () => {
       variables: {
         personId: 1,
         person: {
-          firstname: "AA",
-          lastname: "BB",
+          firstname: 'AA',
+          lastname: 'BB',
           age: 20,
           salary: 20,
-          birthdate: new Date("01/01/2017")
+          birthdate: new Date('01/01/2017')
         },
         companyId: 1,
         company: {
-          name: "Company B"
+          name: 'Company B'
         }
       }
     };
@@ -516,15 +544,15 @@ describe("graphql", () => {
       .send(postData)
       .expect(200)
       .then(res => {
-        assert.equal(res.body.data.updatePerson.firstname, "AA");
-        assert.equal(res.body.data.updatePerson.lastname, "BB");
+        assert.equal(res.body.data.updatePerson.firstname, 'AA');
+        assert.equal(res.body.data.updatePerson.lastname, 'BB');
         assert.equal(res.body.data.updatePerson.age, 20);
         assert.equal(res.body.data.updatePerson.salary, 20);
         assert.equal(
           res.body.data.updatePerson.birthdate,
-          moment(new Date("01/01/2017")).toISOString()
+          moment(new Date('01/01/2017')).toISOString()
         );
-        assert.equal(res.body.data.updateCompany.name, "Company B");
+        assert.equal(res.body.data.updateCompany.name, 'Company B');
       });
   });
 });

@@ -132,6 +132,16 @@ describe('graphql', () => {
       });
   });
 
+  it('should get a company using filter', () => {
+    return test
+      .post(`/graphql`)
+      .send({ query: `{company(filter:{name:"test"}){name}}` })
+      .expect(200)
+      .then(res => {
+        assert.equal(res.body.data.company.name, 'test');
+      });
+  });
+
   it('should get people', () => {
     const postData = {
       query: `query people($sort: [PersonSortType!]){
